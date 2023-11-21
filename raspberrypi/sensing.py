@@ -1,11 +1,14 @@
 import numpy as np
 import cv2
 
-base_line = 0.8
+base_line = 0.5
 WIDTH = 40
 HEIGHT = 30
 
+prev_pos = -1
+
 def sense_line(img):
+    global prev_pos
 
     # resize image
     img = cv2.resize(img, (WIDTH, HEIGHT))
@@ -26,8 +29,9 @@ def sense_line(img):
     # get position
     detected = np.where(base_line_array > 0)
     if (detected[0].size == 0):
-        detected = 0
+        detected = prev_pos
     else:
         detected = (np.mean(detected) - (WIDTH / 2)) / (WIDTH / 2)
+        prev_pos = detected
 
     return detected, img

@@ -12,14 +12,15 @@ video_config = picam2.create_video_configuration({
 picam2.configure(video_config)
 picam2.start()
 
-power = 50
+power = 80
+k = 0.7
 
 while True:
     # get image from pi camera
     im = picam2.capture_array()
     
     # rotate 180
-    im = cv2.rotate(im, cv2.ROTATE_180)
+    # im = cv2.rotate(im, cv2.ROTATE_180)
 
     # line sensing
     pos, im = sensing.sense_line(im)
@@ -27,7 +28,9 @@ while True:
     # motor speed control
     # drive.set_power(100, 200)
     print(pos)
-    drive.set_power(int(power * (1 + pos)), int(power * (1 - pos)))
+    drive.set_power(int(power * (1 + k * pos)), int(power * (1 - k * pos)))
+
+    im = cv2.resize(im, (400, 300))
 
     cv2.imshow("Camera", im)
     cv2.waitKey(1)
