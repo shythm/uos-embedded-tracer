@@ -31,24 +31,26 @@ def sense_line(img):
 
     return pos, img
 
-prev_pos = -1
-score_threshold = SCALEDOWN_WIDTH * 0.2
+_prev_pos = -1
+SCORE_THRESHOLD = SCALEDOWN_WIDTH * 0.2
 
-def _get_next_position(self, arr):
+def _get_next_position(arr):
+    global _prev_pos
+
     max_score = -math.inf
     max_pos = -1
 
     for pos, detected in enumerate(arr):
         if detected:
             # calculate hueristic score
-            score = -abs(self.prev_pos - pos)
+            score = -abs(_prev_pos - pos)
             if score > max_score:
                 max_score = score
                 max_pos = pos
 
-    if max_pos == -1 or max_score < self.score_threshold:
+    if max_pos == -1 or max_score < SCORE_THRESHOLD:
         # no line detected or detected line is too far
-        max_pos = self.prev_pos
+        max_pos = _prev_pos
 
-    self.prev_pos = max_pos # update prev_pos
+    _prev_pos = max_pos # update prev_pos
     return max_pos
