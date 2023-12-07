@@ -1,6 +1,6 @@
 import serial
 
-PORT = '/dev/ttyAMA0'
+PORT = '/dev/ttyAMA1'
 BAUDRATE = 9600
 
 ser = serial.Serial(
