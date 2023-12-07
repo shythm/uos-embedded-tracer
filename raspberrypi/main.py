@@ -3,34 +3,43 @@ import cv2
 import sensing
 import drive
 
-picam2 = Picamera2()
-# picam2.create_preview_configuration({ "format": "YUV420" })
-video_config = picam2.create_video_configuration({
-    'format': 'RGB888',
-    'size': (200, 150),
-})
-picam2.configure(video_config)
-picam2.start()
+def main():
+    # camera initialization
+    picam2 = Picamera2()
+    video_config = picam2.create_video_configuration({
+        'format': 'RGB888',
+        'size': (200, 150),
+    })
+    picam2.configure(video_config)
+    picam2.start()
 
-power = 80
-k = 0.7
+    # constants initialization
+    power = 50
+    k = 0.50
 
-while True:
-    # get image from pi camera
-    im = picam2.capture_array()
-    
-    # rotate 180
-    # im = cv2.rotate(im, cv2.ROTATE_180)
+    # driving loop
+    while True:
+        # get image from pi camera
+        im = picam2.capture_array()
 
-    # line sensing
-    pos, im = sensing.sense_line(im)
+        # line sensing
+        pos, im = sensing.sense_line(im)
+        
+        left = int(power * (1 + k * pos))
+        right = int(power * (1 - k * pos))
+        
+        drive.set_power(left, right)
 
-    # motor speed control
-    # drive.set_power(100, 200)
-    print(pos)
-    drive.set_power(int(power * (1 + k * pos)), int(power * (1 - k * pos)))
+        im = cv2.resize(im, (400, 300))
 
-    im = cv2.resize(im, (400, 300))
+        cv2.imshow("Camera", im)
+        cv2.waitKey(33) # delay 33ms
 
-    cv2.imshow("Camera", im)
-    cv2.waitKey(1)
+def final():
+    drive.set_power(0, 0)
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        final()
