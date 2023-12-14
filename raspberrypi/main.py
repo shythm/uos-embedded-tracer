@@ -14,8 +14,8 @@ def main():
     picam2.start()
 
     # constants initialization
-    power = 50
-    k = 0.50
+    POWER = 50
+    K_P = 0.50
 
     # driving loop
     while True:
@@ -23,10 +23,10 @@ def main():
         im = picam2.capture_array()
 
         # line sensing
-        pos, im = sensing.sense_line(im)
+        im, pos = sensing.sense_line(im, 'immediate')
         
-        left = int(power * (1 + k * pos))
-        right = int(power * (1 - k * pos))
+        left = int(POWER * (1 + K_P * pos))
+        right = int(POWER * (1 - K_P * pos))
         
         drive.set_power(left, right)
 
