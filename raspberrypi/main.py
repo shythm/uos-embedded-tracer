@@ -2,6 +2,7 @@ from picamera2 import Picamera2
 import cv2
 import sensing
 import drive
+import time
 
 def main():
     # camera initialization
@@ -14,8 +15,11 @@ def main():
     picam2.start()
 
     # constants initialization
-    POWER = 50
-    K_P = 0.50
+    POWER = 70
+    K_P = 0.80
+
+    drive.set_power(84, 84)
+    time.sleep(0.1)
 
     # driving loop
     while True:
@@ -27,6 +31,7 @@ def main():
         
         left = int(POWER * (1 + K_P * pos))
         right = int(POWER * (1 - K_P * pos))
+        print(pos, left, right)
         
         drive.set_power(left, right)
 
@@ -36,7 +41,7 @@ def main():
         cv2.waitKey(33) # delay 33ms
 
 def final():
-    drive.set_power(0, 0)
+    drive.set_power_off()
 
 if __name__ == '__main__':
     try:
