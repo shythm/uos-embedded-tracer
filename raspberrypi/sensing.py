@@ -31,8 +31,10 @@ def _get_pos_arr(img):
 _prev_pos = -1
 
 def _get_next_position_immediate(pos_arr) -> int:
+    global _prev_pos
+    
     detected = np.where(pos_arr)
-    if len(detected) == 0:
+    if detected[0].size == 0:
         # no line detected
         return _prev_pos
     else:
