@@ -43,6 +43,44 @@
   L+000\nR+000\nL+100\nR+100\nL-050\nR-050\nL+255\nR+255\nL+255\nR-255\n
   ```
 
+## Arduino 시리얼 통신을 통한 모터 제어
+
+상술한 통신 규약에 맞게 시리얼 통신을 입력받아 모터의 속도를 제어합니다.
+
+기본적으로 Motor 당 PWM, Direction(정방향, 역방향) PIN을 1개씩 가지며 총 4개의 핀에 대한 Output을 제어합니다.
+
+### 예외 처리 및 조정
+
+1. Motor Type과 Direction에 따라 pwmValue와 모터 속도의 비례 관계가 역전되어서 이를 여타 변수에 무관하게 수치와 속도 간의 비례 관계만 남기도록 조정하였습니다.
+   
+```c
+int pwmValue = 0;
+if(motorType == 'L') {
+  if(direction == '+'){
+    pwmValue = pwmValueString.toInt();
+  } else {
+    pwmValue = 255 - pwmValueString.toInt();
+  }
+} else {
+  if(direction == '+'){
+    pwmValue = 255 - pwmValueString.toInt();
+  } else {
+    pwmValue = pwmValueString.toInt();
+  }
+}
+```
+
+2. 속도 값에 이상 수치가 들어오는 경우 이에 대한 예외 처리를 진행하였습니다.
+
+```c
+// Handle Exceptional Value
+if(pwmValue > 255) {
+  pwmValue = 255;
+} else if(pwmValue < 0) {
+  pwmValue = 0;
+}
+```
+
 ## 차선 인식
 1. 주어진 이미지를 특정 크기로 조정한다(40 x 30).
     - `img = cv2.resize(img, (WIDTH, HEIGHT))`
