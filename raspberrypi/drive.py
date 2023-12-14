@@ -12,19 +12,32 @@ ser = serial.Serial(
     timeout=1
 )
 
-MIN_POWER = 100
+DEAD_ZONE_LEFT = 38
+DEAD_ZONE_RIGHT = 30
 MAX_POWER = 255
 
-def set_power(left: int, right: int):
-    # map power [0, 255] to [MIN_POWER, MAX_POWER]
-    left = int((left - MIN_POWER) / (MAX_POWER - MIN_POWER) * 255)
-    right = int((right - MIN_POWER) / (MAX_POWER - MIN_POWER) * 255)
+def set_power_off():
+    # send command
+    cmd = 'L+000\nR+000\n'.format()
+    ser.write(cmd.encode())
 
-    # the power is between 0 and 255
-    left = max(MIN_POWER, left)
-    left = min(left, MAX_POWER)
-    right = max(MIN_POWER, right)
-    right = min(right, MAX_POWER)
+def set_power(left: int, right: int):
+    # 1. map power [0, 255] to [MIN_POWER, MAX_POWER]
+    # 2. limit power [0, 255]
+
+    if left > DEAD_ZONE_LEFT:
+        left = int((left - DEAD_ZONE_LEFT) / (MAX_POWER - DEAD_ZONE_LEFT) * 255)
+        left = max(DEAD_ZONE_LEFT, left)
+        left = min(left, MAX_POWER)
+    else:
+        left = DEAD_ZONE_LEFT
+
+    if right > DEAD_ZONE_RIGHT:
+        right = int((right - DEAD_ZONE_RIGHT) / (MAX_POWER - DEAD_ZONE_RIGHT) * 255)
+        right = max(DEAD_ZONE_RIGHT, right)
+        right = min(right, MAX_POWER)
+    else:
+        right = DEAD_ZONE_RIGHT
 
     # send command
     cmd = 'L{:+03d}\n'.format(left)
